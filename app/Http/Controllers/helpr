@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\news_data;
+use App\Models\news_rajasthan;
+use Illuminate\Support\Facades\Log;
+
+class helpr extends Controller
+{
+    public function fetchNews($rssFeedUrl, $model)
+    {
+        $rss = simplexml_load_file($rssFeedUrl);
+
+        if ($rss) {
+            foreach ($rss->channel->item as $item) {
+                // इमेज URL निकालना
+                $imageUrl = null;
+                if ($item->children('media', true)->content) {
+                    $imageContent = $item->children('media', true)->content;
+                    $imageUrl = (string) $imageContent->attributes()->url;
+                }
+
+                // लॉगिंग
+                Log::info("Fetched Image URL: " . ($imageUrl ?? 'No Image'));
+
+                // खबर पहले से मौजूद है या नहीं
+                $existingNews = $model::where('title', (string)$item->title)->first();
+                if (!$existingNews) {
+                    $newsdatasav = new $model();
+                    $newsdatasav->title = (string)$item->title;
+                    $newsdatasav->link = (string)$item->link;
+                    $newsdatasav->description = strip_tags((string)$item->description); // CDATA को सही से निकालने के लिए
+                    $newsdatasav->published_at = date('Y-m-d H:i:s', strtotime((string)$item->pubDate));
+                    $newsdatasav->image_url = $imageUrl ?? 'default-image.jpg';
+                    $newsdatasav->save();
+                }
+            }
+        } else {
+            Log::error("RSS फीड लोड करने में समस्या: $rssFeedUrl");
+        }
+    }
+
+    public function fetchMPNews()
+    {
+        $this->fetchNews('https://www.bhaskar.com/rss-v1--category-1739.xml', news_data::class);
+    }
+
+    public function fetchRJNews()
+    {
+        $this->fetchNews('https://www.bhaskar.com/rss-v1--category-1740.xml', news_rajasthan::class);
+    }
+
+    public function index($state = 'all')
+    {
+        $this->fetchMPNews();
+        $this->fetchRJNews();
+    
+        if ($state === 'mp') {
+            $newsItems = news_data::orderBy('published_at', 'desc')->get();
+        } elseif ($state === 'rj') {
+            $newsItems = news_rajasthan::orderBy('published_at', 'desc')->get();
+        } else {
+            $mpNews = news_data::orderBy('published_at', 'desc')->get();
+            $rjNews = news_rajasthan::orderBy('published_at', 'desc')->get();
+            $newsItems = $mpNews->merge($rjNews)->sortByDesc('published_at');
+        }
+    
+        return view('rssdata', compact('newsItems', 'state'));
+    }
+    
+}

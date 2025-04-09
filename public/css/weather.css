@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+form {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 50%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+select, button {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #0056b3;
+}
+.weather-container {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    width: 50%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+}
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+/*graph*/
+
+/* Styling for the entire line graph container */
+.line-graph-container {
+    position: relative;
+    width: 80%;
+    height: 300px;
+    margin: 50px auto;
+    border: 2px solid #ccc;
+    background-color: #f4f4f4;
+}
+
+/* Styling for the path (line) inside the SVG */
+.line-graph path {
+    stroke: #4CAF50; /* Line color */
+    fill: transparent;
+    stroke-width: 3;
+}
+
+/* Data points */
+.data-point {
+    position: absolute;
+    bottom: 0;
+    font-size: 14px;
+    color: #4CAF50;
+    font-weight: bold;
+    transform: translateX(-50%);
+}
+
+.data-point::after {
+    content: '°C';
+}

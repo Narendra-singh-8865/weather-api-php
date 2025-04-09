@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/news.css">
+    <title>{{ $state === 'rj' ? 'RJ की ताज़ा खबरें' : 'MP की ताज़ा खबरें' }}</title>
+</head>
+<body>
+    @php    use Illuminate\Support\Str; 
+    @endphp
+    <div class="container">
+        <h1 class="title">🔴 {{ $state === 'rj' ? 'Rajasthan' : 'Madhya Pradesh' }} की ताज़ा खबरें</h1>
+
+        <div class="btn-group">
+            <a href="{{ route('news', 'mp') }}" class="btn btn-mp">MP News</a>
+            <a href="{{ route('news', 'rj') }}" class="btn btn-rj">RJ News</a>
+        </div>
+
+        <div class="news-list">
+            @foreach($newsItems as $newsItem)
+                <div class="news-card">
+                    <img src="{{ $newsItem->image_url ?? asset('images/default-news.jpg') }}" 
+                         alt="News Image" class="news-image">
+                    <div class="news-content">
+                        <h2 class="news-title">{{ trim($newsItem->title) }}</h2>
+                        <p class="news-description">
+                            {{ Str::limit(strip_tags($newsItem->description), 200, '...') }}
+                        </p>
+                        <p class="news-date">
+                            🕒 {{ \Carbon\Carbon::parse($newsItem->published_at)->diffForHumans() }}
+                        </p>
+                        <a href="{{ $newsItem->link }}" target="_blank" class="read-more">पूरा पढ़ें</a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</body>
+</html>
